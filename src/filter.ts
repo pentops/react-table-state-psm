@@ -122,7 +122,7 @@ export function getPSMQueryFiltersFromTableState(filters: FilterState): PsmListV
     return undefined;
   }
 
-  const psmFilters: PsmListV1Filter[] = filters.map(buildPSMFilterFromFilterSet).filter(Boolean) as PsmListV1Filter[];
+  const psmFilters: PsmListV1Filter[] = filters.flatMap(buildPSMFilterFromFilterSet).filter(Boolean) as PsmListV1Filter[];
 
   return psmFilters.length ? psmFilters : undefined;
 }

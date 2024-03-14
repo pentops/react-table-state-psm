@@ -13,9 +13,9 @@ export interface TableStateOptions {
   onSort?: OnChangeFn<SortingState>;
 }
 
-export function useTableState({ initialSearch, initialSort, onSearch, onSort }: TableStateOptions) {
+export function useTableState({ initialFilters, initialSearch, initialSort, onFilter, onSearch, onSort }: TableStateOptions) {
   const [searchValue, setSearchValue, psmSearch] = useTableSearch(initialSearch, onSearch);
-  const [filterValues, setFilterValues, psmFilters] = useTableFilters();
+  const [filterValues, setFilterValues, psmFilters] = useTableFilters(initialFilters, onFilter);
   const [sortValues, setSortValues, psmSort] = useTableSort(initialSort, onSort);
 
   const psmQuery: PsmListV1QueryRequest | undefined = useMemo(() => {
