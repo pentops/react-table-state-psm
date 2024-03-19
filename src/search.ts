@@ -9,11 +9,13 @@ export interface ColumnSearch {
 export type SearchState = ColumnSearch[];
 
 export function getPSMQuerySearchesFromTableState(search: SearchState | undefined): PsmListV1Search[] | undefined {
-  if (!search?.length) {
+  const nonEmptySearches = search?.filter((s) => s.value.length > 0);
+
+  if (!nonEmptySearches?.length) {
     return undefined;
   }
 
-  return search.map((s) => ({
+  return nonEmptySearches.map((s) => ({
     field: s.id,
     value: s.value,
   }));

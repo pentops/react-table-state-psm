@@ -1,6 +1,6 @@
 {
   "name": "@pentops/react-table-state-psm",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "dist/index.js",
   "type": "module",
@@ -19,8 +19,8 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-typescript": "^11.1.6",
-    "@types/node": "^20.11.16",
-    "@types/react": "^18.2.65",
+    "@types/node": "^20.11.30",
+    "@types/react": "^18.2.67",
     "@types/react-dom": "^18.2.22",
     "prettier": "^3.2.5",
     "react": "^18.2.0",
