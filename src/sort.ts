@@ -1,14 +1,16 @@
 import { useCallback, useMemo, useState } from 'react';
 import { OnChangeFn, PsmListV1Sort, Updater } from './types';
 
-export interface ColumnSort {
+export interface ColumnSort<TIdType extends string = string> {
+  id: TIdType;
   desc: boolean;
-  id: string;
 }
 
-export type SortingState = ColumnSort[];
+export type SortingState<TSortField extends string = never> = ColumnSort<TSortField>[];
 
-export function getPSMQuerySortsFromTableState(tableSorts: SortingState | undefined): PsmListV1Sort[] | undefined {
+export function getPSMQuerySortsFromTableState<TSortField extends string = never>(
+  tableSorts: SortingState<TSortField> | undefined,
+): PsmListV1Sort<TSortField>[] | undefined {
   if (!tableSorts || !tableSorts.length) {
     return undefined;
   }
@@ -19,13 +21,20 @@ export function getPSMQuerySortsFromTableState(tableSorts: SortingState | undefi
   }));
 }
 
-export function useTableSort(
-  initialSort?: SortingState,
-  onSort?: OnChangeFn<SortingState>,
-): [SortingState, OnChangeFn<SortingState>, PsmListV1Sort[] | undefined] {
-  const [state, setState] = useState<SortingState>(initialSort || []);
-  const handleColumnSortChange: OnChangeFn<SortingState> = useCallback(
-    (updater: Updater<SortingState>) => {
+export interface BaseTableSort<TIdType extends string = string, TLabelType = string, TSortOptions extends object = {}> {
+  id: TIdType;
+  label: TLabelType;
+  defaultDescending?: boolean;
+  options?: TSortOptions;
+}
+
+export function useTableSort<TSortField extends string = never>(
+  initialSort?: SortingState<TSortField>,
+  onSort?: OnChangeFn<SortingState<TSortField>>,
+): [SortingState<TSortField>, OnChangeFn<SortingState<TSortField>>, PsmListV1Sort<TSortField>[] | undefined] {
+  const [state, setState] = useState<SortingState<TSortField>>(initialSort || []);
+  const handleColumnSortChange: OnChangeFn<SortingState<TSortField>> = useCallback(
+    (updater: Updater<SortingState<TSortField>>) => {
       const result = typeof updater === 'function' ? updater(state) : updater;
       setState(result);
 

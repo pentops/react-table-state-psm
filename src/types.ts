@@ -1,9 +1,9 @@
-export interface PsmListV1And {
-  filters?: PsmListV1Filter[];
+export interface PsmListV1And<TFilterField extends string = never> {
+  filters?: PsmListV1Filter<TFilterField>[];
 }
 
-export interface PsmListV1Field {
-  name?: string;
+export interface PsmListV1Field<TFilterField extends string = never> {
+  name?: TFilterField;
   type?: {
     // start oneOf
     range?: PsmListV1Range;
@@ -12,18 +12,18 @@ export interface PsmListV1Field {
   };
 }
 
-export interface PsmListV1Filter {
+export interface PsmListV1Filter<TFilterField extends string = never> {
   type?: {
     // start oneOf
-    and?: PsmListV1And;
-    field?: PsmListV1Field;
-    or?: PsmListV1Or;
+    and?: PsmListV1And<TFilterField>;
+    field?: PsmListV1Field<TFilterField>;
+    or?: PsmListV1Or<TFilterField>;
     // end oneOf
   };
 }
 
-export interface PsmListV1Or {
-  filters?: PsmListV1Filter[];
+export interface PsmListV1Or<TFilterField extends string = never> {
+  filters?: PsmListV1Filter<TFilterField>[];
 }
 
 export interface PsmListV1Range {
@@ -31,22 +31,22 @@ export interface PsmListV1Range {
   min?: string;
 }
 
-export interface PsmListV1Search {
-  field?: string;
+export interface PsmListV1Search<TSearchField extends string = never> {
+  field?: TSearchField;
   value?: string;
 }
 
-export interface PsmListV1Sort {
+export interface PsmListV1Sort<TSortField extends string = never> {
   descending: boolean;
-  field?: string;
+  field?: TSortField;
 }
 
-export interface PsmListV1QueryRequest {
-  filters?: PsmListV1Filter[];
-  searches?: PsmListV1Search[];
-  sorts?: PsmListV1Sort[];
+export interface PsmListV1QueryRequest<TSearchField extends string = never, TSortField extends string = never, TFilterField extends string = never> {
+  filters?: PsmListV1Filter<TFilterField>[];
+  searches?: PsmListV1Search<TSearchField>[];
+  sorts?: PsmListV1Sort<TSortField>[];
 }
 
-export type Updater<T> = T | ((old: T) => T)
+export type Updater<T> = T | ((old: T) => T);
 
-export type OnChangeFn<T> = (updaterOrValue: Updater<T>) => void
+export type OnChangeFn<T> = (updaterOrValue: Updater<T>) => void;

@@ -6,21 +6,50 @@ export interface RangeFilter {
   min?: string;
 }
 
-export interface FilterValue {
-  id: string;
+export interface FilterValue<TIdType extends string = string> {
+  id: TIdType;
   value: { exact: string } | { in: string[] } | { range: RangeFilter };
 }
 
 export type FilterInclusion = 'and' | 'or';
 
-export interface FilterSet {
+export interface FilterSet<TFilterField extends string = never> {
   inclusion?: FilterInclusion;
-  type?: { filters: FilterValue[] } | { nested: FilterState };
+  type?: { filters: FilterValue<TFilterField>[] } | { nested: FilterState<TFilterField> };
 }
 
-export type FilterState = FilterSet[];
+export type FilterState<TFilterField extends string = never> = FilterSet<TFilterField>[];
 
-function buildPSMFieldFilter(filterValue: FilterValue): PsmListV1Filter | undefined {
+export interface EnumFilterOption<TValue extends string = string, TLabel = string> {
+  value: TValue;
+  label: TLabel;
+}
+
+export interface EnumFilterType {
+  options: EnumFilterOption[];
+}
+
+export interface DateFilterType {
+  allowTime?: boolean;
+}
+
+export type BaseFilterType = { enum: EnumFilterType } | { date: DateFilterType } | { numeric: {} };
+
+export interface BaseTableFilter<
+  TIdType extends string = string,
+  TValueType extends string = string,
+  TLabelType = string,
+  TFilterType extends BaseFilterType = BaseFilterType,
+  TFilterOptions extends object = {},
+> {
+  id: TIdType;
+  label: TLabelType;
+  defaultValues?: TValueType[];
+  type: TFilterType;
+  options?: TFilterOptions;
+}
+
+function buildPSMFieldFilter<TFilterField extends string = never>(filterValue: FilterValue<TFilterField>): PsmListV1Filter<TFilterField> | undefined {
   if (!filterValue.value) {
     return;
   }
@@ -73,14 +102,16 @@ function buildPSMFieldFilter(filterValue: FilterValue): PsmListV1Filter | undefi
   return;
 }
 
-function buildPSMFilterFromFilterSet(filterSet: FilterSet): PsmListV1Filter | PsmListV1Filter[] | undefined {
+function buildPSMFilterFromFilterSet<TFilterField extends string = never>(
+  filterSet: FilterSet<TFilterField>,
+): PsmListV1Filter<TFilterField> | PsmListV1Filter<TFilterField>[] | undefined {
   if (!filterSet.type) {
     return;
   }
 
   if ('filters' in filterSet.type) {
-    return filterSet.type.filters.reduce<PsmListV1Filter[]>((accum, curr) => {
-      const filter = buildPSMFieldFilter(curr);
+    return filterSet.type.filters.reduce<PsmListV1Filter<TFilterField>[]>((accum, curr) => {
+      const filter = buildPSMFieldFilter<TFilterField>(curr);
 
       if (filter) {
         accum.push(filter);
@@ -91,7 +122,7 @@ function buildPSMFilterFromFilterSet(filterSet: FilterSet): PsmListV1Filter | Ps
   }
 
   if ('nested' in filterSet.type) {
-    const subFilters = filterSet.type.nested.map(buildPSMFilterFromFilterSet).filter(Boolean) as PsmListV1Filter[];
+    const subFilters = filterSet.type.nested.map(buildPSMFilterFromFilterSet).filter(Boolean) as PsmListV1Filter<TFilterField>[];
 
     switch (filterSet.inclusion) {
       case 'or':
@@ -115,25 +146,29 @@ function buildPSMFilterFromFilterSet(filterSet: FilterSet): PsmListV1Filter | Ps
   }
 }
 
-export function getPSMQueryFiltersFromTableState(filters: FilterState): PsmListV1Filter[] | undefined {
+export function getPSMQueryFiltersFromTableState<TFilterField extends string = never>(
+  filters: FilterState<TFilterField>,
+): PsmListV1Filter<TFilterField>[] | undefined {
   const filterGroupCount = Object.keys(filters).length;
 
   if (!filters || !filterGroupCount) {
     return undefined;
   }
 
-  const psmFilters: PsmListV1Filter[] = filters.flatMap(buildPSMFilterFromFilterSet).filter(Boolean) as PsmListV1Filter[];
+  const psmFilters: PsmListV1Filter<TFilterField>[] = filters
+    .flatMap((i) => buildPSMFilterFromFilterSet<TFilterField>(i))
+    .filter(Boolean) as PsmListV1Filter<TFilterField>[];
 
   return psmFilters.length ? psmFilters : undefined;
 }
 
-export function useTableFilters(
-  initialFilters?: FilterState,
-  onFilter?: OnChangeFn<FilterState>,
-): [FilterState, OnChangeFn<FilterState>, PsmListV1Filter[] | undefined] {
-  const [state, setState] = useState<FilterState>(initialFilters || []);
-  const handleColumnFilterChange: OnChangeFn<FilterState> = useCallback(
-    (updater: Updater<FilterState>) => {
+export function useTableFilters<TFilterField extends string = never>(
+  initialFilters?: FilterState<TFilterField>,
+  onFilter?: OnChangeFn<FilterState<TFilterField>>,
+): [FilterState<TFilterField>, OnChangeFn<FilterState<TFilterField>>, PsmListV1Filter<TFilterField>[] | undefined] {
+  const [state, setState] = useState<FilterState<TFilterField>>(initialFilters || []);
+  const handleColumnFilterChange: OnChangeFn<FilterState<TFilterField>> = useCallback(
+    (updater: Updater<FilterState<TFilterField>>) => {
       const result = typeof updater === 'function' ? updater(state) : updater;
       setState(result);
 

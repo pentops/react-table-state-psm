@@ -1,14 +1,16 @@
 import { useCallback, useMemo, useState } from 'react';
 import { OnChangeFn, PsmListV1Search, Updater } from './types';
 
-export interface ColumnSearch {
-  id: string;
+export interface ColumnSearch<TIdType extends string = string> {
+  id: TIdType;
   value: string;
 }
 
-export type SearchState = ColumnSearch[];
+export type SearchState<TSearchField extends string = never> = ColumnSearch<TSearchField>[];
 
-export function getPSMQuerySearchesFromTableState(search: SearchState | undefined): PsmListV1Search[] | undefined {
+export function getPSMQuerySearchesFromTableState<TSearchField extends string = never>(
+  search: SearchState<TSearchField> | undefined,
+): PsmListV1Search<TSearchField>[] | undefined {
   const nonEmptySearches = search?.filter((s) => s.value.length > 0);
 
   if (!nonEmptySearches?.length) {
@@ -21,13 +23,19 @@ export function getPSMQuerySearchesFromTableState(search: SearchState | undefine
   }));
 }
 
-export function useTableSearch(
-  initialSearch?: SearchState,
-  onSearch?: OnChangeFn<SearchState>,
-): [SearchState, OnChangeFn<SearchState>, PsmListV1Search[] | undefined] {
-  const [state, setState] = useState<SearchState>(initialSearch || []);
-  const handleSearchChange: OnChangeFn<SearchState> = useCallback(
-    (updater: Updater<SearchState>) => {
+export interface BaseTableSearch<TIdType extends string = string, TLabelType = string, TSearchOptions extends object = {}> {
+  id: TIdType;
+  label: TLabelType;
+  options?: TSearchOptions;
+}
+
+export function useTableSearch<TSearchField extends string = never>(
+  initialSearch?: SearchState<TSearchField>,
+  onSearch?: OnChangeFn<SearchState<TSearchField>>,
+): [SearchState<TSearchField>, OnChangeFn<SearchState<TSearchField>>, PsmListV1Search<TSearchField>[] | undefined] {
+  const [state, setState] = useState<SearchState<TSearchField>>(initialSearch || []);
+  const handleSearchChange: OnChangeFn<SearchState<TSearchField>> = useCallback(
+    (updater: Updater<SearchState<TSearchField>>) => {
       const result = typeof updater === 'function' ? updater(state) : updater;
       setState(result);
 
