@@ -29,11 +29,26 @@ export interface EnumFilterType {
   options: EnumFilterOption[];
 }
 
+export interface OneOfFilterOption<TValue extends string = string, TLabel = string> {
+  value: TValue;
+  label: TLabel;
+}
+
+export interface OneOfFilterType {
+  options: OneOfFilterOption[];
+}
+
 export interface DateFilterType {
   allowTime?: boolean;
 }
 
-export type BaseFilterType = { enum: EnumFilterType } | { date: DateFilterType } | { numeric: {} };
+export type BaseFilterType =
+  | { enum: EnumFilterType }
+  | { oneOf: OneOfFilterType }
+  | { date: DateFilterType }
+  | { numeric: {} }
+  | { string: {} }
+  | { boolean: {} };
 
 export interface BaseTableFilter<
   TIdType extends string = string,
