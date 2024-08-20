@@ -6,9 +6,9 @@ export interface RangeFilter {
   min?: string;
 }
 
-export interface FilterValue<TIdType extends string = string> {
+export interface FilterValue<TIdType extends string = string, TValueType extends string = string> {
   id: TIdType;
-  value: { exact: string } | { in: string[] } | { range: RangeFilter };
+  value: { exact: TValueType } | { in: TValueType[] } | { range: RangeFilter };
 }
 
 export type FilterInclusion = 'and' | 'or';
@@ -25,8 +25,8 @@ export interface EnumFilterOption<TValue extends string = string, TLabel = strin
   label: TLabel;
 }
 
-export interface EnumFilterType {
-  options: EnumFilterOption[];
+export interface EnumFilterType<TValue extends string = string, TLabel = string> {
+  options: EnumFilterOption<TValue, TLabel>[];
 }
 
 export interface OneOfFilterOption<TValue extends string = string, TLabel = string> {
@@ -34,8 +34,8 @@ export interface OneOfFilterOption<TValue extends string = string, TLabel = stri
   label: TLabel;
 }
 
-export interface OneOfFilterType {
-  options: OneOfFilterOption[];
+export interface OneOfFilterType<TValue extends string = string, TLabel = string> {
+  options: OneOfFilterOption<TValue, TLabel>[];
 }
 
 export interface DateFilterType {
@@ -50,21 +50,15 @@ export type BaseFilterType =
   | { string: {} }
   | { boolean: {} };
 
-export interface BaseTableFilter<
-  TIdType extends string = string,
-  TValueType extends string = string,
-  TLabelType = string,
-  TFilterType extends BaseFilterType = BaseFilterType,
-  TFilterOptions extends object = {},
-> {
+export interface BaseTableFilter<TIdType extends string = string, TLabelType = string, TFilterType extends BaseFilterType = BaseFilterType> {
   id: TIdType;
   label: TLabelType;
-  defaultValues?: TValueType[];
   type: TFilterType;
-  options?: TFilterOptions;
 }
 
-function buildPSMFieldFilter<TFilterField extends string = never>(filterValue: FilterValue<TFilterField>): PsmListV1Filter<TFilterField> | undefined {
+function buildPSMFieldFilter<TFilterField extends string = never, TValue extends string = string>(
+  filterValue: FilterValue<TFilterField, TValue>,
+): PsmListV1Filter<TFilterField> | undefined {
   if (!filterValue.value) {
     return;
   }
