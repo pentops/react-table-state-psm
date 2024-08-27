@@ -4,29 +4,34 @@ import { OnChangeFn, PsmListV1QueryRequest } from './types';
 import { SearchState, useTableSearch } from './search';
 import { FilterState, useTableFilters } from './filter';
 
-export interface TableStateOptions<TSearchField extends string = never, TSortField extends string = never, TFilterField extends string = never> {
-  initialFilters?: FilterState<TFilterField>;
-  initialSearch?: SearchState<TSearchField>;
-  initialSort?: SortingState<TSortField>;
-  onFilter?: OnChangeFn<FilterState<TFilterField>>;
-  onSearch?: OnChangeFn<SearchState<TSearchField>>;
-  onSort?: OnChangeFn<SortingState<TSortField>>;
+// Extract generic types from PsmListV1QueryRequest
+type ExtractSearchField<T> = T extends PsmListV1QueryRequest<infer TSearchField, any, any> ? TSearchField : never;
+type ExtractSortField<T> = T extends PsmListV1QueryRequest<any, infer TSortField, any> ? TSortField : never;
+type ExtractFilterField<T> = T extends PsmListV1QueryRequest<any, any, infer TFilterField> ? TFilterField : never;
+
+export interface TableStateOptions<T extends PsmListV1QueryRequest<ExtractSearchField<T>, ExtractSortField<T>, ExtractFilterField<T>> | undefined> {
+  initialFilters?: FilterState<ExtractFilterField<T>>;
+  initialSearch?: SearchState<ExtractSearchField<T>>;
+  initialSort?: SortingState<ExtractSortField<T>>;
+  onFilter?: OnChangeFn<FilterState<ExtractFilterField<T>>>;
+  onSearch?: OnChangeFn<SearchState<ExtractSearchField<T>>>;
+  onSort?: OnChangeFn<SortingState<ExtractSortField<T>>>;
 }
 
-export function useTableState<TSearchField extends string = never, TSortField extends string = never, TFilterField extends string = never>({
+export function useTableState<T extends PsmListV1QueryRequest<ExtractSearchField<T>, ExtractSortField<T>, ExtractFilterField<T>> | undefined>({
   initialFilters,
   initialSearch,
   initialSort,
   onFilter,
   onSearch,
   onSort,
-}: TableStateOptions<TSearchField, TSortField, TFilterField>) {
-  const [searchValue, setSearchValue, psmSearch] = useTableSearch(initialSearch, onSearch);
-  const [filterValues, setFilterValues, psmFilters] = useTableFilters(initialFilters, onFilter);
-  const [sortValues, setSortValues, psmSort] = useTableSort(initialSort, onSort);
+}: TableStateOptions<T>) {
+  const [searchValue, setSearchValue, psmSearch] = useTableSearch<ExtractSearchField<T>>(initialSearch, onSearch);
+  const [filterValues, setFilterValues, psmFilters] = useTableFilters<ExtractFilterField<T>>(initialFilters, onFilter);
+  const [sortValues, setSortValues, psmSort] = useTableSort<ExtractSortField<T>>(initialSort, onSort);
 
-  const psmQuery: PsmListV1QueryRequest<TSearchField, TSortField, TFilterField> | undefined = useMemo(() => {
-    const base: PsmListV1QueryRequest<TSearchField, TSortField, TFilterField> = {};
+  const psmQuery: T | undefined = useMemo(() => {
+    const base = {} as NonNullable<T>;
 
     if (psmSearch?.length) {
       base.searches = psmSearch;

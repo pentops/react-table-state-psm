@@ -13,13 +13,11 @@ export interface PsmListV1Field<TFilterField extends string = never> {
 }
 
 export interface PsmListV1Filter<TFilterField extends string = never> {
-  type?: {
-    // start oneOf
-    and?: PsmListV1And<TFilterField>;
-    field?: PsmListV1Field<TFilterField>;
-    or?: PsmListV1Or<TFilterField>;
-    // end oneOf
-  };
+  // start oneOf
+  and?: PsmListV1And<TFilterField>;
+  field?: PsmListV1Field<TFilterField>;
+  or?: PsmListV1Or<TFilterField>;
+  // end oneOf
 }
 
 export interface PsmListV1Or<TFilterField extends string = never> {

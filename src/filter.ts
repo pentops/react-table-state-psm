@@ -65,31 +65,25 @@ function buildPSMFieldFilter<TFilterField extends string = never, TValue extends
 
   if ('in' in filterValue.value) {
     return {
-      type: {
-        or: {
-          filters: filterValue.value.in.map((value) => ({
+      or: {
+        filters: filterValue.value.in.map((value) => ({
+          field: {
+            name: filterValue.id,
             type: {
-              field: {
-                name: filterValue.id,
-                type: {
-                  value,
-                },
-              },
+              value,
             },
-          })),
-        },
+          },
+        })),
       },
     };
   }
 
   if ('range' in filterValue.value) {
     return {
-      type: {
-        field: {
-          name: filterValue.id,
-          type: {
-            range: filterValue.value.range,
-          },
+      field: {
+        name: filterValue.id,
+        type: {
+          range: filterValue.value.range,
         },
       },
     };
@@ -97,12 +91,10 @@ function buildPSMFieldFilter<TFilterField extends string = never, TValue extends
 
   if ('exact' in filterValue.value) {
     return {
-      type: {
-        field: {
-          name: filterValue.id,
-          type: {
-            value: filterValue.value.exact,
-          },
+      field: {
+        name: filterValue.id,
+        type: {
+          value: filterValue.value.exact,
         },
       },
     };
@@ -136,19 +128,15 @@ function buildPSMFilterFromFilterSet<TFilterField extends string = never>(
     switch (filterSet.inclusion) {
       case 'or':
         return {
-          type: {
-            or: {
-              filters: subFilters,
-            },
+          or: {
+            filters: subFilters,
           },
         };
       default:
       case 'and':
         return {
-          type: {
-            and: {
-              filters: subFilters,
-            },
+          and: {
+            filters: subFilters,
           },
         };
     }
