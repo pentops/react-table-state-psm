@@ -48,3 +48,8 @@ export interface PsmListV1QueryRequest<TSearchField extends string = never, TSor
 export type Updater<T> = T | ((old: T) => T);
 
 export type OnChangeFn<T> = (updaterOrValue: Updater<T>) => void;
+
+// Extract generic types from PsmListV1QueryRequest
+export type ExtractSearchField<T> = T extends PsmListV1QueryRequest<infer TSearchField, any, any> ? TSearchField : never;
+export type ExtractSortField<T> = T extends PsmListV1QueryRequest<any, infer TSortField, any> ? TSortField : never;
+export type ExtractFilterField<T> = T extends PsmListV1QueryRequest<any, any, infer TFilterField> ? TFilterField : never;
