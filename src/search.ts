@@ -23,10 +23,9 @@ export function getPSMQuerySearchesFromTableState<TSearchField extends string = 
   }));
 }
 
-export interface BaseTableSearch<TIdType extends string = string, TLabelType = string, TSearchOptions extends object = {}> {
+export interface BaseTableSearch<TIdType extends string = string, TLabelType = string> {
   id: TIdType;
   label: TLabelType;
-  options?: TSearchOptions;
 }
 
 export function useTableSearch<TSearchField extends string = never>(
