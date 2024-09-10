@@ -35,7 +35,7 @@ export interface PsmListV1Search<TSearchField extends string = never> {
 }
 
 export interface PsmListV1Sort<TSortField extends string = never> {
-  descending: boolean;
+  descending?: boolean;
   field?: TSortField;
 }
 
