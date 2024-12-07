@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { OnChangeFn, PsmListV1Search, Updater } from './types';
+import type { OnChangeFn, PsmListV1Search, Updater } from './types';
 
 export interface ColumnSearch<TIdType extends string = string> {
   id: TIdType;

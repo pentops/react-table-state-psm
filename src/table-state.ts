@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import { SortingState, useTableSort } from './sort';
-import { ExtractFilterField, ExtractSearchField, ExtractSortField, OnChangeFn, PsmListV1QueryRequest } from './types';
-import { SearchState, useTableSearch } from './search';
-import { FilterState, useTableFilters } from './filter';
+import { type SortingState, useTableSort } from './sort';
+import type { ExtractFilterField, ExtractSearchField, ExtractSortField, OnChangeFn, PsmListV1QueryRequest } from './types';
+import { type SearchState, useTableSearch } from './search';
+import { type FilterState, useTableFilters } from './filter';
 
 export interface TableStateOptions<T extends PsmListV1QueryRequest<ExtractSearchField<T>, ExtractSortField<T>, ExtractFilterField<T>> | undefined> {
   initialFilters?: FilterState<ExtractFilterField<T>>;

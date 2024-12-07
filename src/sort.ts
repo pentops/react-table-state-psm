@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { OnChangeFn, PsmListV1Sort, Updater } from './types';
+import type { OnChangeFn, PsmListV1Sort, Updater } from './types';
 
 export interface ColumnSort<TIdType extends string = string> {
   id: TIdType;
