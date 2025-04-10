@@ -5,6 +5,12 @@ import { type SearchState, useTableSearch } from './search';
 import { type FilterState, useTableFilters } from './filter';
 
 export interface TableStateOptions<T extends PsmListV1QueryRequest<ExtractSearchField<T>, ExtractSortField<T>, ExtractFilterField<T>> | undefined> {
+  // Fixed filters are always applied to the query (cannot be cleared)
+  fixedFilters?: FilterState<ExtractFilterField<T>>;
+  // Fixed searches are always applied to the query (cannot be cleared)
+  fixedSearch?: SearchState<ExtractSearchField<T>>;
+  // Fixed sorts are always applied to the query (cannot be cleared)
+  fixedSort?: SortingState<ExtractSortField<T>>;
   initialFilters?: FilterState<ExtractFilterField<T>>;
   initialSearch?: SearchState<ExtractSearchField<T>>;
   initialSort?: SortingState<ExtractSortField<T>>;
@@ -14,6 +20,9 @@ export interface TableStateOptions<T extends PsmListV1QueryRequest<ExtractSearch
 }
 
 export function useTableState<T extends PsmListV1QueryRequest<ExtractSearchField<T>, ExtractSortField<T>, ExtractFilterField<T>> | undefined>({
+  fixedFilters,
+  fixedSearch,
+  fixedSort,
   initialFilters,
   initialSearch,
   initialSort,
@@ -21,9 +30,9 @@ export function useTableState<T extends PsmListV1QueryRequest<ExtractSearchField
   onSearch,
   onSort,
 }: TableStateOptions<T>) {
-  const [searchValue, setSearchValue, psmSearch] = useTableSearch<ExtractSearchField<T>>(initialSearch, onSearch);
-  const [filterValues, setFilterValues, psmFilters] = useTableFilters<ExtractFilterField<T>>(initialFilters, onFilter);
-  const [sortValues, setSortValues, psmSort] = useTableSort<ExtractSortField<T>>(initialSort, onSort);
+  const [searchValue, setSearchValue, psmSearch] = useTableSearch<ExtractSearchField<T>>(initialSearch, fixedSearch, onSearch);
+  const [filterValues, setFilterValues, psmFilters] = useTableFilters<ExtractFilterField<T>>(initialFilters, fixedFilters, onFilter);
+  const [sortValues, setSortValues, psmSort] = useTableSort<ExtractSortField<T>>(initialSort, fixedSort, onSort);
 
   const psmQuery: T | undefined = useMemo(() => {
     const base = {} as NonNullable<T>;

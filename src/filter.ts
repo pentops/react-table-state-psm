@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { OnChangeFn, PsmListV1Filter, Updater } from './types';
 
 export interface RangeFilter {
@@ -161,22 +161,24 @@ export function getPSMQueryFiltersFromTableState<TFilterField extends string = n
 
 export function useTableFilters<TFilterField extends string = never>(
   initialFilters?: FilterState<TFilterField>,
+  fixedFilters?: FilterState<TFilterField>,
   onFilter?: OnChangeFn<FilterState<TFilterField>>,
 ): [FilterState<TFilterField>, OnChangeFn<FilterState<TFilterField>>, PsmListV1Filter<TFilterField>[] | undefined] {
+  const hasUpdatedRef = useRef(false);
   const [state, setState] = useState<FilterState<TFilterField>>(initialFilters || []);
-  const handleColumnFilterChange: OnChangeFn<FilterState<TFilterField>> = useCallback(
-    (updater: Updater<FilterState<TFilterField>>) => {
-      const result = typeof updater === 'function' ? updater(state) : updater;
-      setState(result);
+  const handleColumnFilterChange: OnChangeFn<FilterState<TFilterField>> = useCallback((updater: Updater<FilterState<TFilterField>>) => {
+    hasUpdatedRef.current = true;
+    setState((prevState) => (typeof updater === 'function' ? updater(prevState) : updater));
+  }, []);
 
-      if (onFilter) {
-        onFilter(result);
-      }
+  useEffect(() => {
+    if (hasUpdatedRef.current && onFilter) {
+      onFilter(state);
+    }
+  }, [state]);
 
-      return result;
-    },
-    [state, onFilter],
+  return useMemo(
+    () => [state, handleColumnFilterChange, getPSMQueryFiltersFromTableState([...(state || []), ...(fixedFilters || [])])],
+    [state, fixedFilters, handleColumnFilterChange],
   );
-
-  return useMemo(() => [state, handleColumnFilterChange, getPSMQueryFiltersFromTableState(state)], [state, handleColumnFilterChange]);
 }

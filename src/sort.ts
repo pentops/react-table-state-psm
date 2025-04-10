@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { OnChangeFn, PsmListV1Sort, Updater } from './types';
 
 export interface ColumnSort<TIdType extends string = string> {
@@ -30,22 +30,24 @@ export interface BaseTableSort<TIdType extends string = string, TLabelType = str
 
 export function useTableSort<TSortField extends string = never>(
   initialSort?: SortingState<TSortField>,
+  fixedSorts?: SortingState<TSortField>,
   onSort?: OnChangeFn<SortingState<TSortField>>,
 ): [SortingState<TSortField>, OnChangeFn<SortingState<TSortField>>, PsmListV1Sort<TSortField>[] | undefined] {
+  const hasUpdatedRef = useRef(false);
   const [state, setState] = useState<SortingState<TSortField>>(initialSort || []);
-  const handleColumnSortChange: OnChangeFn<SortingState<TSortField>> = useCallback(
-    (updater: Updater<SortingState<TSortField>>) => {
-      const result = typeof updater === 'function' ? updater(state) : updater;
-      setState(result);
+  const handleColumnSortChange: OnChangeFn<SortingState<TSortField>> = useCallback((updater: Updater<SortingState<TSortField>>) => {
+    hasUpdatedRef.current = true;
+    setState((prevState) => (typeof updater === 'function' ? updater(prevState) : updater));
+  }, []);
 
-      if (onSort) {
-        onSort(result);
-      }
+  useEffect(() => {
+    if (hasUpdatedRef.current && onSort) {
+      onSort(state);
+    }
+  }, [state]);
 
-      return result;
-    },
-    [state, onSort],
+  return useMemo(
+    () => [state, handleColumnSortChange, getPSMQuerySortsFromTableState([...(state || []), ...(fixedSorts || [])])],
+    [state, fixedSorts, handleColumnSortChange],
   );
-
-  return useMemo(() => [state, handleColumnSortChange, getPSMQuerySortsFromTableState(state)], [state, handleColumnSortChange]);
 }

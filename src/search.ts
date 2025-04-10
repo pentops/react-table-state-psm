@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { OnChangeFn, PsmListV1Search, Updater } from './types';
 
 export interface ColumnSearch<TIdType extends string = string> {
@@ -30,22 +30,24 @@ export interface BaseTableSearch<TIdType extends string = string, TLabelType = s
 
 export function useTableSearch<TSearchField extends string = never>(
   initialSearch?: SearchState<TSearchField>,
+  fixedSearch?: SearchState<TSearchField>,
   onSearch?: OnChangeFn<SearchState<TSearchField>>,
 ): [SearchState<TSearchField>, OnChangeFn<SearchState<TSearchField>>, PsmListV1Search<TSearchField>[] | undefined] {
+  const hasUpdatedRef = useRef(false);
   const [state, setState] = useState<SearchState<TSearchField>>(initialSearch || []);
-  const handleSearchChange: OnChangeFn<SearchState<TSearchField>> = useCallback(
-    (updater: Updater<SearchState<TSearchField>>) => {
-      const result = typeof updater === 'function' ? updater(state) : updater;
-      setState(result);
+  const handleSearchChange: OnChangeFn<SearchState<TSearchField>> = useCallback((updater: Updater<SearchState<TSearchField>>) => {
+    hasUpdatedRef.current = true;
+    setState((prevState) => (typeof updater === 'function' ? updater(prevState) : updater));
+  }, []);
 
-      if (onSearch) {
-        onSearch(result);
-      }
+  useEffect(() => {
+    if (hasUpdatedRef.current && onSearch) {
+      onSearch(state);
+    }
+  }, [state]);
 
-      return result;
-    },
-    [state, onSearch],
+  return useMemo(
+    () => [state, handleSearchChange, getPSMQuerySearchesFromTableState([...(state || []), ...(fixedSearch || [])])],
+    [state, fixedSearch, handleSearchChange],
   );
-
-  return useMemo(() => [state, handleSearchChange, getPSMQuerySearchesFromTableState(state)], [state, handleSearchChange]);
 }
