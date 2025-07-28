@@ -65,16 +65,12 @@ function buildPSMFieldFilter<TFilterField extends string = never, TValue extends
 
   if ('in' in filterValue.value) {
     return {
-      or: {
-        filters: filterValue.value.in.map((value) => ({
-          field: {
-            name: filterValue.id,
-            type: {
-              value,
-            },
-          },
-        })),
-      },
+      field: {
+        name: filterValue.id,
+        type: {
+          in: filterValue.value.in,
+        }
+      }
     };
   }
 

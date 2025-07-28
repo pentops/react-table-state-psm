@@ -9,13 +9,17 @@ export interface PsmListV1Range {
 
 export type PsmListV1FieldType =
   | {
-  '!type'?: 'value';
-  'value': string;
-}
+    '!type'?: 'value';
+    'value': string;
+    }
   | {
-  '!type'?: 'range';
-  'range': PsmListV1Range;
-};
+      '!type'?: 'range';
+      'range': PsmListV1Range;
+    }
+  | {
+      '!type'?: 'in';
+      'in': string[];
+    };
 
 export interface PsmListV1Field<TFilterField extends string = never> {
   name?: TFilterField;

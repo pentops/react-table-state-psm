@@ -1,6 +1,6 @@
 {
   "name": "@pentops/react-table-state-psm",
-  "version": "0.0.13",
+    "version": "0.0.13",
   "description": "",
   "main": "dist/index.js",
   "type": "module",
