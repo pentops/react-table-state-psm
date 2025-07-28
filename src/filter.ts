@@ -68,7 +68,9 @@ function buildPSMFieldFilter<TFilterField extends string = never, TValue extends
       field: {
         name: filterValue.id,
         type: {
-          in: filterValue.value.in,
+          in: {
+            values: filterValue.value.in,
+          },
         }
       }
     };

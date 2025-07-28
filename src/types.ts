@@ -7,6 +7,10 @@ export interface PsmListV1Range {
   min?: string;
 }
 
+export interface PsmListV1InValues {
+  values: string[];
+}
+
 export type PsmListV1FieldType =
   | {
     '!type'?: 'value';
@@ -18,7 +22,7 @@ export type PsmListV1FieldType =
     }
   | {
       '!type'?: 'in';
-      'in': string[];
+      'in': PsmListV1InValues;
     };
 
 export interface PsmListV1Field<TFilterField extends string = never> {
