@@ -2,31 +2,42 @@ export interface PsmListV1And<TFilterField extends string = never> {
   filters?: PsmListV1Filter<TFilterField>[];
 }
 
-export interface PsmListV1Field<TFilterField extends string = never> {
-  name?: TFilterField;
-  type?: {
-    // start oneOf
-    range?: PsmListV1Range;
-    value?: string;
-    // end oneOf
-  };
-}
-
-export interface PsmListV1Filter<TFilterField extends string = never> {
-  // start oneOf
-  and?: PsmListV1And<TFilterField>;
-  field?: PsmListV1Field<TFilterField>;
-  or?: PsmListV1Or<TFilterField>;
-  // end oneOf
-}
-
-export interface PsmListV1Or<TFilterField extends string = never> {
-  filters?: PsmListV1Filter<TFilterField>[];
-}
-
 export interface PsmListV1Range {
   max?: string;
   min?: string;
+}
+
+export type PsmListV1FieldType =
+  | {
+  '!type'?: 'value';
+  'value': string;
+}
+  | {
+  '!type'?: 'range';
+  'range': PsmListV1Range;
+};
+
+export interface PsmListV1Field<TFilterField extends string = never> {
+  name?: TFilterField;
+  type: PsmListV1FieldType;
+}
+
+export type PsmListV1Filter<TFilterField extends string = never> =
+  | {
+  '!type'?: 'field';
+  'field': PsmListV1Field<TFilterField>;
+}
+  | {
+  '!type'?: 'and';
+  'and': PsmListV1And<TFilterField>;
+}
+  | {
+  '!type'?: 'or';
+  'or': PsmListV1Or<TFilterField>;
+};
+
+export interface PsmListV1Or<TFilterField extends string = never> {
+  filters?: PsmListV1Filter<TFilterField>[];
 }
 
 export interface PsmListV1Search<TSearchField extends string = never> {
