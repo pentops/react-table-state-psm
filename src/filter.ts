@@ -71,8 +71,8 @@ function buildPSMFieldFilter<TFilterField extends string = never, TValue extends
           in: {
             values: filterValue.value.in,
           },
-        }
-      }
+        },
+      },
     };
   }
 
@@ -131,7 +131,6 @@ function buildPSMFilterFromFilterSet<TFilterField extends string = never>(
           },
         };
       default:
-      case 'and':
         return {
           and: {
             filters: subFilters,
@@ -173,7 +172,7 @@ export function useTableFilters<TFilterField extends string = never>(
     if (hasUpdatedRef.current && onFilter) {
       onFilter(state);
     }
-  }, [state]);
+  }, [state, onFilter]);
 
   return useMemo(
     () => [state, handleColumnFilterChange, getPSMQueryFiltersFromTableState([...(state || []), ...(fixedFilters || [])])],

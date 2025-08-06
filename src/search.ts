@@ -44,7 +44,7 @@ export function useTableSearch<TSearchField extends string = never>(
     if (hasUpdatedRef.current && onSearch) {
       onSearch(state);
     }
-  }, [state]);
+  }, [state, onSearch]);
 
   return useMemo(
     () => [state, handleSearchChange, getPSMQuerySearchesFromTableState([...(state || []), ...(fixedSearch || [])])],

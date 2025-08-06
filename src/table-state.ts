@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
+import { type FilterState, useTableFilters } from './filter';
+import { type SearchState, useTableSearch } from './search';
 import { type SortingState, useTableSort } from './sort';
 import type { ExtractFilterField, ExtractSearchField, ExtractSortField, OnChangeFn, PsmListV1QueryRequest } from './types';
-import { type SearchState, useTableSearch } from './search';
-import { type FilterState, useTableFilters } from './filter';
 
 export interface TableStateOptions<T extends PsmListV1QueryRequest<ExtractSearchField<T>, ExtractSortField<T>, ExtractFilterField<T>> | undefined> {
   // Fixed filters are always applied to the query (cannot be cleared)

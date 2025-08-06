@@ -44,7 +44,7 @@ export function useTableSort<TSortField extends string = never>(
     if (hasUpdatedRef.current && onSort) {
       onSort(state);
     }
-  }, [state]);
+  }, [state, onSort]);
 
   return useMemo(
     () => [state, handleColumnSortChange, getPSMQuerySortsFromTableState([...(state || []), ...(fixedSorts || [])])],
